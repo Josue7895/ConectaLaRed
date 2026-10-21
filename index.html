@@ -1,0 +1,1655 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conecta la Red - Capa Física</title>
+
+<style>
+:root {
+  --fondo: #0b1127;
+  --panel: #162341;
+  --borde: #41567e;
+  --blanco: #f6f4e8;
+  --amarillo: #ffdf69;
+  --verde: #70e5b2;
+  --rojo: #ff778a;
+  --azul: #78c9ff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(circle at 20% 10%, #23345a, #0b1127 65%);
+  color: var(--blanco);
+  font-family: "Trebuchet MS", Arial, sans-serif;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+button:focus-visible {
+  outline: 3px solid var(--amarillo);
+  outline-offset: 3px;
+}
+
+.shell {
+  max-width: 860px;
+  margin: auto;
+  padding: 16px 16px 45px;
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.logo {
+  font-weight: 1000;
+  letter-spacing: 2px;
+  color: var(--amarillo);
+  text-shadow: 3px 3px #8d4a63;
+}
+
+.clock {
+  font-family: monospace;
+  font-size: 23px;
+  background: #0a152d;
+  border: 3px solid var(--amarillo);
+  padding: 8px 12px;
+  border-radius: 9px;
+  white-space: nowrap;
+}
+
+.card {
+  background: var(--panel);
+  border: 3px solid var(--borde);
+  border-radius: 15px;
+  padding: clamp(17px, 4vw, 30px);
+  box-shadow: 0 8px 0 #070b19;
+}
+
+.hidden {
+  display: none !important;
+}
+
+h1, h2 {
+  text-align: center;
+  margin: 6px 0 12px;
+}
+
+h1 {
+  font-size: clamp(29px, 6vw, 49px);
+  color: var(--amarillo);
+  letter-spacing: 2px;
+  text-shadow: 3px 4px #8b4468;
+}
+
+h2 {
+  font-size: clamp(22px, 4vw, 32px);
+}
+
+p {
+  line-height: 1.5;
+}
+
+.muted {
+  color: #c6d4ee;
+}
+
+.center {
+  text-align: center;
+}
+
+.pill {
+  display: inline-block;
+  background: #304369;
+  padding: 7px 14px;
+  border-radius: 99px;
+  font-weight: bold;
+  color: var(--amarillo);
+}
+
+.btn {
+  border: 0;
+  border-bottom: 5px solid #86602c;
+  border-radius: 10px;
+  background: var(--amarillo);
+  color: #1c2341;
+  padding: 13px 24px;
+  font-weight: 900;
+  font-size: 17px;
+  min-height: 48px;
+}
+
+.btn:hover {
+  filter: brightness(1.08);
+}
+
+.btn:active {
+  transform: translateY(3px);
+  border-bottom-width: 2px;
+}
+
+.danger {
+  background: var(--rojo);
+  border-bottom-color: #a13d51;
+}
+
+input[type="text"] {
+  width: min(100%, 360px);
+  font: inherit;
+  font-size: 18px;
+  padding: 13px;
+  border: 3px solid #7694c4;
+  border-radius: 10px;
+  background: #0c1730;
+  color: white;
+  margin: 12px auto;
+  display: block;
+}
+
+.hero {
+  font-size: 75px;
+  margin: 25px 0 5px;
+}
+
+.progress {
+  display: flex;
+  gap: 7px;
+  justify-content: center;
+  margin: 15px 0 20px;
+}
+
+.dot {
+  height: 9px;
+  flex: 1;
+  max-width: 72px;
+  background: #344666;
+  border-radius: 8px;
+}
+
+.dot.on {
+  background: var(--verde);
+}
+
+.scene {
+  background: linear-gradient(180deg, #1c3155, #0c1932);
+  border: 2px solid #455c86;
+  border-radius: 12px;
+  min-height: 210px;
+  padding: 18px;
+  margin: 14px 0;
+  position: relative;
+}
+
+.flex {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.tile {
+  background: #253b61;
+  border: 3px solid #7087b0;
+  border-radius: 12px;
+  padding: 12px;
+  text-align: center;
+  min-width: 95px;
+  min-height: 72px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  font-weight: bold;
+}
+
+.emoji {
+  font-size: 38px;
+  line-height: 1.1;
+}
+
+.slot {
+  border: 3px dashed #7f9bbf;
+  min-height: 72px;
+  min-width: 95px;
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: #152542;
+}
+
+.slot.filled {
+  border-style: solid;
+  border-color: var(--verde);
+  background: #1b4b4c;
+}
+
+.choice {
+  border: 3px solid #6882ad;
+  border-radius: 12px;
+  background: #213456;
+  color: white;
+  padding: 13px;
+  min-width: 110px;
+  min-height: 64px;
+  font-size: 17px;
+  font-weight: bold;
+}
+
+.choice:hover,
+.choice.selected {
+  border-color: var(--amarillo);
+  background: #3a4d71;
+}
+
+.choice:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.wire {
+  border: 3px solid #8da4ca;
+  border-radius: 12px;
+  padding: 9px 13px;
+  min-height: 52px;
+  background: #1d3053;
+  color: white;
+  font-weight: bold;
+}
+
+.wire.selected {
+  outline: 3px solid var(--amarillo);
+}
+
+.wire.done {
+  opacity: 0.5;
+}
+
+.target {
+  border: 3px dashed #94a8c7;
+  background: #10213d;
+  border-radius: 12px;
+  padding: 9px 13px;
+  min-height: 52px;
+  color: white;
+  font-weight: bold;
+}
+
+.target.done {
+  border-color: var(--verde);
+  background: #225448;
+}
+
+.wireRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  max-width: 540px;
+  margin: auto;
+}
+
+.wireCol {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.note {
+  font-size: 13px;
+  color: #b9c9e5;
+  text-align: center;
+  margin-top: 12px;
+}
+
+.status {
+  text-align: center;
+  min-height: 26px;
+  color: var(--amarillo);
+  font-weight: bold;
+  margin: 12px;
+}
+
+.signal {
+  font-family: monospace;
+  font-size: clamp(22px, 5vw, 36px);
+  letter-spacing: 8px;
+  color: var(--verde);
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 100%;
+  animation: travel 1.6s linear infinite;
+}
+
+@keyframes travel {
+  0% {
+    transform: translateX(-45%);
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(45%);
+    opacity: 0.3;
+  }
+}
+
+.signalLine {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 6px;
+  margin: 25px auto;
+}
+
+.signalLine .emoji {
+  font-size: 40px;
+}
+
+.good {
+  color: var(--verde);
+}
+
+.bad {
+  color: var(--rojo);
+}
+
+.mini {
+  font-size: 14px;
+  color: #d0dbf1;
+}
+
+.meter {
+  width: min(360px, 100%);
+  height: 25px;
+  border: 2px solid #7a93ba;
+  border-radius: 15px;
+  background: #0b1831;
+  margin: 20px auto;
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff7e82, #ffe277, #71e9ae);
+  transition: width 0.18s;
+}
+
+.slider {
+  width: min(380px, 95%);
+  accent-color: var(--amarillo);
+  display: block;
+  margin: 22px auto;
+}
+
+.port {
+  width: 85px;
+  height: 75px;
+  border: 3px solid #718db9;
+  background: #12213e;
+  border-radius: 8px;
+  color: white;
+  font-weight: bold;
+}
+
+.broken {
+  border-color: var(--rojo) !important;
+  box-shadow: 0 0 14px #f64a6677;
+}
+
+.endTime {
+  font: 900 clamp(35px, 9vw, 66px) monospace;
+  color: var(--amarillo);
+  margin: 12px 0;
+}
+
+.footer {
+  text-align: center;
+  color: #8fa5ca;
+  font-size: 12px;
+  margin-top: 25px;
+}
+
+.instruction {
+  background: #273b60;
+  border-left: 5px solid var(--amarillo);
+  padding: 11px 13px;
+  border-radius: 6px;
+  margin: 10px 0;
+}
+
+.hint {
+  background: #2c4268;
+  color: white;
+  border: 1px solid #7390bd;
+  border-radius: 9px;
+  padding: 10px 15px;
+}
+
+.line {
+  height: 6px;
+  width: 55px;
+  background: var(--verde);
+  border-radius: 8px;
+}
+
+.brokenLine {
+  height: 6px;
+  width: 55px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--rojo) 0 13px,
+    transparent 13px 22px
+  );
+}
+
+@media (max-width: 490px) {
+  .tile {
+    min-width: 75px;
+    padding: 9px;
+  }
+
+  .emoji {
+    font-size: 31px;
+  }
+
+  .wireRow {
+    gap: 8px;
+  }
+
+  .wire,
+  .target {
+    font-size: 14px;
+    padding: 7px;
+  }
+
+  .scene {
+    padding: 12px;
+  }
+
+  .logo {
+    font-size: 14px;
+  }
+
+  .clock {
+    font-size: 19px;
+  }
+
+  .port {
+    width: 72px;
+  }
+
+  .line,
+  .brokenLine {
+    width: 30px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<main class="shell">
+
+  <div class="top">
+    <div class="logo">⚡ CONECTA LA RED</div>
+    <div id="clock" class="clock">00:00</div>
+  </div>
+
+  <section id="welcome" class="card center">
+
+    <div class="hero">🖥️🔌📡</div>
+
+    <span class="pill">MISIÓN: CAPA FÍSICA</span>
+
+    <h1>CONECTA<br>LA RED</h1>
+
+    <p>
+      8 tareas rápidas, estilo videojuego.
+      ¡Repara las conexiones antes que los demás!
+    </p>
+
+    <input
+      type="text"
+      id="playerName"
+      maxlength="24"
+      placeholder="Escribe tu nombre"
+      autocomplete="off"
+    >
+
+    <p class="mini">
+      Si te equivocas, vuelves al nivel 1.
+      <b>El tiempo nunca se reinicia.</b>
+    </p>
+
+    <button id="start" class="btn">
+      ▶ JUGAR
+    </button>
+
+  </section>
+
+  <section id="game" class="card hidden">
+
+    <div class="center">
+      <span id="levelLabel" class="pill">
+        NIVEL 1 DE 8
+      </span>
+
+      <h2 id="levelTitle"></h2>
+    </div>
+
+    <div id="progress" class="progress"></div>
+
+    <p id="levelInfo" class="instruction"></p>
+
+    <div id="scene" class="scene"></div>
+
+    <div id="status" class="status"></div>
+
+    <div class="center">
+      <button id="hintBtn" class="hint">
+        💡 ¿Qué tengo que hacer?
+      </button>
+    </div>
+
+  </section>
+
+  <section id="animation" class="card hidden center">
+
+    <div class="hero">✅</div>
+
+    <h2 class="good">
+      ¡CONEXIÓN RESTABLECIDA!
+    </h2>
+
+    <p id="learning"></p>
+
+    <div class="scene">
+
+      <p>Los bits viajan como señales:</p>
+
+      <div class="signalLine">
+
+        <span class="emoji">🖥️</span>
+
+        <div class="signal">
+          01010101
+        </div>
+
+        <span class="emoji">📡</span>
+
+      </div>
+
+      <p class="mini">
+        Los números son una animación.
+        No tienes que descifrarlos.
+      </p>
+
+    </div>
+
+    <p id="nextMessage">
+      Preparando la siguiente misión...
+    </p>
+
+  </section>
+
+  <section id="lose" class="card hidden center">
+
+    <div class="hero">⚠️</div>
+
+    <h2 class="bad">
+      ¡UPS! CONEXIÓN FALLIDA
+    </h2>
+
+    <p id="loseReason"></p>
+
+    <p>
+      Vuelves al nivel 1, pero
+      <b>tu cronómetro sigue corriendo.</b>
+    </p>
+
+    <button id="retry" class="btn danger">
+      ↻ VOLVER AL NIVEL 1
+    </button>
+
+  </section>
+
+  <section id="finish" class="card hidden center">
+
+    <div class="hero">🏆</div>
+
+    <h1>
+      ¡MISIÓN<br>CUMPLIDA!
+    </h1>
+
+    <h2 id="winner"></h2>
+
+    <p>
+      Completaste los 8 niveles de la capa física.
+    </p>
+
+    <p class="muted">
+      TU TIEMPO FINAL
+    </p>
+
+    <div id="finalTime" class="endTime">
+      00:00
+    </div>
+
+    <p class="good">
+      <b>¡FELICIDADES, INGENIERO!</b>
+    </p>
+
+    <p>
+      Muéstrale esta pantalla a los expositores
+      para participar por el premio.
+    </p>
+
+    <p class="mini">
+      El resultado queda aquí.
+      No cierres ni recargues esta página.
+    </p>
+
+  </section>
+
+  <div class="footer">
+    REDES I · MODELO OSI · CAPA 1: FÍSICA
+  </div>
+
+</main>
+
+<script>
+
+(() => {
+
+"use strict";
+
+const $ = id => document.getElementById(id);
+
+let name = "";
+let level = 0;
+let started = 0;
+let elapsed = 0;
+let timer = null;
+let locked = false;
+let selected = null;
+
+const lessons = [
+  "Los cables permiten que las señales eléctricas viajen entre equipos.",
+  "La señal Wi-Fi viaja por ondas de radio y puede debilitarse con la distancia.",
+  "Un cable dañado puede interrumpir la transmisión de datos.",
+  "Reemplazar un cable defectuoso permite recuperar el enlace físico.",
+  "Los puertos son conexiones físicas: si uno falla, se puede probar otro.",
+  "El switch conecta equipos dentro de una red local.",
+  "Revisar cables, puertos y señal ayuda a diagnosticar fallas físicas.",
+  "¡Una red bien conectada puede transmitir bits de un equipo a otro!"
+];
+
+const titles = [
+  "CABLES CRUZADOS",
+  "RECUPERA LA SEÑAL",
+  "ENCUENTRA LA FALLA",
+  "CAMBIA EL CABLE",
+  "ACTIVA LOS PUERTOS",
+  "ORDENA LA RED",
+  "REPARACIÓN EXPRESS",
+  "MISIÓN FINAL"
+];
+
+const instructions = [
+  "Une los 5 cables con su terminal del mismo color. Toca un cable y luego su terminal.",
+  "Mueve el router con la barra hasta que los 3 dispositivos tengan buena señal. Después, activa la conexión.",
+  "Observa los 4 tramos del cable. Toca el tramo que está roto.",
+  "El cable rojo está dañado. Elige el cable nuevo y colócalo entre los equipos.",
+  "Hay 3 puertos: uno está dañado. Conecta el cable al puerto que funciona.",
+  "Coloca los dispositivos en este orden: computadora, switch y computadora.",
+  "Hay 3 problemas en la red. Repara cada uno tocando la solución correcta.",
+  "Completa la red final: conecta los 3 enlaces en el orden indicado."
+];
+
+const hints = [
+  "Busca el mismo color a la izquierda y a la derecha.",
+  "Mueve el control hasta el centro para mejorar la señal.",
+  "Busca la parte con una grieta roja y chispas.",
+  "El cable que necesitamos debe estar en buen estado.",
+  "El puerto roto tiene una X roja. Elige uno con luz verde.",
+  "El switch va en medio de las dos computadoras.",
+  "Conecta el cable suelto, cambia el puerto dañado y acerca el router.",
+  "Sigue el recorrido: PC, switch, router y celular."
+];
+
+function fmt(ms) {
+
+  let seconds = Math.floor(ms / 1000);
+  let minutes = Math.floor(seconds / 60);
+
+  return (
+    String(minutes).padStart(2, "0") +
+    ":" +
+    String(seconds % 60).padStart(2, "0")
+  );
+
+}
+
+function tick() {
+
+  if (started) {
+
+    elapsed = performance.now() - started;
+
+    $("clock").textContent = fmt(elapsed);
+
+  }
+
+}
+
+function show(id) {
+
+  ["welcome", "game", "animation", "lose", "finish"]
+    .forEach(x => {
+
+      $(x).classList.toggle("hidden", x !== id);
+
+    });
+
+}
+
+function fail(reason = "Esa no era la conexión correcta.") {
+
+  if (locked) return;
+
+  locked = true;
+
+  $("loseReason").textContent = reason;
+
+  show("lose");
+
+}
+
+function winLevel() {
+
+  if (locked) return;
+
+  locked = true;
+
+  $("learning").textContent = lessons[level];
+
+  show("animation");
+
+  if (level === 7) {
+
+    $("nextMessage").textContent =
+      "¡Has superado las ocho misiones!";
+
+    setTimeout(finish, 2300);
+
+  } else {
+
+    $("nextMessage").textContent =
+      "Siguiente nivel en un momento...";
+
+    setTimeout(() => {
+
+      level++;
+
+      render();
+
+    }, 2000);
+
+  }
+
+}
+
+function finish() {
+
+  elapsed = performance.now() - started;
+
+  started = 0;
+
+  clearInterval(timer);
+
+  $("clock").textContent = fmt(elapsed);
+
+  $("finalTime").textContent = fmt(elapsed);
+
+  $("winner").textContent = name;
+
+  show("finish");
+
+}
+
+function render() {
+
+  locked = false;
+  selected = null;
+
+  show("game");
+
+  $("levelLabel").textContent =
+    "NIVEL " + (level + 1) + " DE 8";
+
+  $("levelTitle").textContent = titles[level];
+
+  $("levelInfo").textContent = instructions[level];
+
+  $("status").textContent = "";
+
+  $("progress").innerHTML =
+    Array.from({ length: 8 }, (_, i) => {
+
+      return '<div class="dot ' +
+        (i <= level ? "on" : "") +
+        '"></div>';
+
+    }).join("");
+
+  const scene = $("scene");
+
+  scene.innerHTML = "";
+
+  [
+    level1,
+    level2,
+    level3,
+    level4,
+    level5,
+    level6,
+    level7,
+    level8
+  ][level](scene);
+
+}
+
+function add(parent, tag, className, content) {
+
+  let element = document.createElement(tag);
+
+  if (className) {
+    element.className = className;
+  }
+
+  if (content !== undefined) {
+    element.textContent = content;
+  }
+
+  parent.appendChild(element);
+
+  return element;
+
+}
+
+function msg(text) {
+
+  $("status").textContent = text;
+
+}
+
+function level1(scene) {
+
+  let colors = [
+    ["Rojo", "#fa6c7a"],
+    ["Azul", "#72c8ff"],
+    ["Verde", "#7ee0a7"],
+    ["Amarillo", "#ffe17b"],
+    ["Morado", "#d7a4ff"]
+  ];
+
+  let order = [2, 4, 0, 3, 1];
+
+  let done = new Set();
+
+  let row = add(scene, "div", "wireRow");
+
+  let left = add(row, "div", "wireCol");
+
+  let right = add(row, "div", "wireCol");
+
+  colors.forEach(([name, color], i) => {
+
+    let button = add(
+      left,
+      "button",
+      "wire",
+      "🔌 " + name
+    );
+
+    button.style.borderColor = color;
+
+    button.onclick = () => {
+
+      if (done.has(i) || locked) return;
+
+      selected = i;
+
+      [...left.children].forEach(x => {
+        x.classList.remove("selected");
+      });
+
+      button.classList.add("selected");
+
+      msg("Ahora toca la terminal del mismo color.");
+
+    };
+
+  });
+
+  order.forEach(i => {
+
+    let [name, color] = colors[i];
+
+    let button = add(
+      right,
+      "button",
+      "target",
+      "● " + name
+    );
+
+    button.style.color = color;
+
+    button.onclick = () => {
+
+      if (locked || done.has(i)) return;
+
+      if (selected === null) {
+
+        msg("Primero toca un cable de la izquierda.");
+
+        return;
+
+      }
+
+      if (selected !== i) {
+
+        fail("Los colores no coinciden.");
+
+        return;
+
+      }
+
+      done.add(i);
+
+      button.classList.add("done");
+
+      left.children[i].classList.add("done");
+
+      left.children[i].disabled = true;
+
+      button.disabled = true;
+
+      selected = null;
+
+      msg(
+        "¡Bien! " +
+        done.size +
+        "/5 cables conectados."
+      );
+
+      if (done.size === 5) {
+        winLevel();
+      }
+
+    };
+
+  });
+
+  add(
+    scene,
+    "p",
+    "note",
+    "Toca un cable a la izquierda y su color a la derecha."
+  );
+
+}
+
+function level2(scene) {
+
+  add(
+    scene,
+    "div",
+    "center emoji",
+    "📱　　 📡　　 💻"
+  );
+
+  let text = add(
+    scene,
+    "p",
+    "center",
+    "Señal en los 3 equipos:"
+  );
+
+  let bar = add(scene, "div", "meter");
+
+  let fill = add(bar, "div", "fill");
+
+  let slider = add(scene, "input", "slider");
+
+  slider.type = "range";
+  slider.min = "0";
+  slider.max = "100";
+  slider.value = "0";
+
+  let label = add(scene, "p", "center", "");
+
+  let button = add(
+    scene,
+    "button",
+    "btn",
+    "📶 ACTIVAR CONEXIÓN"
+  );
+
+  button.style.display = "block";
+  button.style.margin = "auto";
+
+  function update() {
+
+    let value = Number(slider.value);
+
+    let quality = Math.max(
+      0,
+      100 - Math.abs(value - 50) * 2
+    );
+
+    fill.style.width = quality + "%";
+
+    if (quality >= 80) {
+
+      label.textContent =
+        "🟢 Buena señal para todos";
+
+    } else if (quality >= 45) {
+
+      label.textContent =
+        "🟡 Señal regular";
+
+    } else {
+
+      label.textContent =
+        "🔴 Señal débil";
+
+    }
+
+    text.textContent =
+      "Ubicación del router: " + value + "%";
+
+  }
+
+  slider.oninput = update;
+
+  button.onclick = () => {
+
+    let quality =
+      100 - Math.abs(Number(slider.value) - 50) * 2;
+
+    if (quality >= 80) {
+
+      winLevel();
+
+    } else {
+
+      fail(
+        "El router quedó demasiado lejos."
+      );
+
+    }
+
+  };
+
+  update();
+
+}
+
+function level3(scene) {
+
+  add(
+    scene,
+    "p",
+    "center",
+    "🖥️ ━━━━━ Cable Ethernet ━━━━━ 🖥️"
+  );
+
+  let row = add(scene, "div", "flex");
+
+  for (let i = 0; i < 4; i++) {
+
+    let button = add(
+      row,
+      "button",
+      "choice" + (i === 2 ? " broken" : ""),
+      i === 2 ? "⚡〰️⚡" : "━━━━"
+    );
+
+    button.onclick = () => {
+
+      if (i === 2) {
+
+        winLevel();
+
+      } else {
+
+        fail(
+          "Ese tramo está bien. Había que tocar la parte rota."
+        );
+
+      }
+
+    };
+
+  }
+
+  add(
+    scene,
+    "p",
+    "note",
+    "Toca el tramo que muestra daño."
+  );
+
+}
+
+function level4(scene) {
+
+  add(
+    scene,
+    "div",
+    "center emoji",
+    "🖥️　❌　🖥️"
+  );
+
+  add(
+    scene,
+    "p",
+    "center",
+    "El cable anterior está roto. ¿Cuál colocas?"
+  );
+
+  let row = add(scene, "div", "flex");
+
+  [
+    ["🔴 Cable cortado", false],
+    ["🟢 Cable nuevo", true],
+    ["⚠️ Cable pelado", false]
+  ].forEach(([text, correct]) => {
+
+    let button = add(
+      row,
+      "button",
+      "choice",
+      text
+    );
+
+    button.onclick = () => {
+
+      selected = correct;
+
+      [...row.children].forEach(x => {
+        x.classList.remove("selected");
+      });
+
+      button.classList.add("selected");
+
+      msg("Ahora pulsa INSTALAR CABLE.");
+
+    };
+
+  });
+
+  let button = add(
+    scene,
+    "button",
+    "btn",
+    "🔧 INSTALAR CABLE"
+  );
+
+  button.style.display = "block";
+  button.style.margin = "18px auto";
+
+  button.onclick = () => {
+
+    if (selected === true) {
+
+      winLevel();
+
+    } else if (selected === null) {
+
+      msg("Primero elige un cable.");
+
+    } else {
+
+      fail("Ese cable también está dañado.");
+
+    }
+
+  };
+
+}
+
+function level5(scene) {
+
+  add(
+    scene,
+    "p",
+    "center",
+    "El puerto 1 está roto. Elige un puerto que funcione."
+  );
+
+  let row = add(scene, "div", "flex");
+
+  [
+    ["❌", "PUERTO 1", false],
+    ["🟢", "PUERTO 2", true],
+    ["🟢", "PUERTO 3", true]
+  ].forEach(([icon, text, correct]) => {
+
+    let button = add(
+      row,
+      "button",
+      "port",
+      icon + "\n" + text
+    );
+
+    button.style.whiteSpace = "pre-line";
+
+    button.onclick = () => {
+
+      if (correct) {
+
+        winLevel();
+
+      } else {
+
+        fail(
+          "Ese puerto está averiado. Busca una luz verde."
+        );
+
+      }
+
+    };
+
+  });
+
+}
+
+function level6(scene) {
+
+  add(
+    scene,
+    "p",
+    "center",
+    "Completa los tres espacios en el orden correcto."
+  );
+
+  let row = add(scene, "div", "flex");
+
+  let order = [
+    "💻 PC",
+    "🔀 SWITCH",
+    "💻 PC"
+  ];
+
+  let index = 0;
+
+  let slots = order.map(() => {
+
+    return add(
+      row,
+      "div",
+      "slot",
+      "❔"
+    );
+
+  });
+
+  add(
+    scene,
+    "p",
+    "center mini",
+    "Toca las piezas para colocarlas en el siguiente espacio."
+  );
+
+  let pieces = add(scene, "div", "flex");
+
+  [
+    ["🔀 SWITCH", 1],
+    ["💻 PC", 0],
+    ["💻 PC", 2]
+  ].forEach(([label, code]) => {
+
+    let button = add(
+      pieces,
+      "button",
+      "choice",
+      label
+    );
+
+    button.onclick = () => {
+
+      if (locked || button.disabled) return;
+
+      if (
+        (index === 1 && code !== 1) ||
+        (index !== 1 && code === 1)
+      ) {
+
+        fail(
+          "El switch debe quedar entre las dos computadoras."
+        );
+
+        return;
+
+      }
+
+      slots[index].textContent = label;
+
+      slots[index].classList.add("filled");
+
+      button.disabled = true;
+
+      index++;
+
+      if (index === 3) {
+
+        winLevel();
+
+      }
+
+    };
+
+  });
+
+}
+
+function level7(scene) {
+
+  let tasks = [
+    {
+      title: "🔌 Cable suelto",
+      options: [
+        "Conectarlo",
+        "Cortar el cable"
+      ],
+      correct: 0
+    },
+    {
+      title: "❌ Puerto averiado",
+      options: [
+        "Seguir usando el puerto",
+        "Cambiar de puerto"
+      ],
+      correct: 1
+    },
+    {
+      title: "📶 Señal débil",
+      options: [
+        "Acercar el router",
+        "Alejar el router"
+      ],
+      correct: 0
+    }
+  ];
+
+  let index = 0;
+
+  let box = add(scene, "div", "center");
+
+  function draw() {
+
+    box.innerHTML = "";
+
+    add(
+      box,
+      "p",
+      "pill",
+      "REPARACIÓN " + (index + 1) + " DE 3"
+    );
+
+    add(
+      box,
+      "div",
+      "hero",
+      index === 0
+        ? "🔌"
+        : index === 1
+          ? "🔧"
+          : "📡"
+    );
+
+    add(
+      box,
+      "h2",
+      "",
+      tasks[index].title
+    );
+
+    let row = add(box, "div", "flex");
+
+    tasks[index].options.forEach((option, j) => {
+
+      let button = add(
+        row,
+        "button",
+        "choice",
+        option
+      );
+
+      button.onclick = () => {
+
+        if (j !== tasks[index].correct) {
+
+          fail(
+            "Esa acción no repara la falla."
+          );
+
+          return;
+
+        }
+
+        index++;
+
+        if (index === 3) {
+
+          winLevel();
+
+        } else {
+
+          draw();
+
+        }
+
+      };
+
+    });
+
+  }
+
+  draw();
+
+}
+
+function level8(scene) {
+
+  add(
+    scene,
+    "p",
+    "center",
+    "Enciende los enlaces en el orden indicado."
+  );
+
+  let row = add(scene, "div", "flex");
+
+  ["💻", "🔀", "📡", "📱"].forEach((icon, i) => {
+
+    let text =
+      i === 0 ? " PC" :
+      i === 1 ? " SWITCH" :
+      i === 2 ? " ROUTER" :
+      " CELULAR";
+
+    add(
+      row,
+      "div",
+      "tile",
+      icon + text
+    );
+
+    if (i < 3) {
+
+      add(
+        row,
+        "div",
+        "brokenLine"
+      );
+
+    }
+
+  });
+
+  let step = 0;
+
+  let actions = [
+    "1. PC → SWITCH",
+    "2. SWITCH → ROUTER",
+    "3. ROUTER → CELULAR"
+  ];
+
+  let box = add(scene, "div", "flex");
+
+  actions.forEach((text, i) => {
+
+    let button = add(
+      box,
+      "button",
+      "choice",
+      text
+    );
+
+    button.onclick = () => {
+
+      if (locked || button.disabled) return;
+
+      if (i !== step) {
+
+        fail(
+          "Los enlaces deben activarse siguiendo el recorrido de la señal."
+        );
+
+        return;
+
+      }
+
+      button.disabled = true;
+
+      button.classList.add("good");
+
+      row.children[i * 2 + 1].className = "line";
+
+      step++;
+
+      msg(
+        "Enlaces activos: " + step + "/3"
+      );
+
+      if (step === 3) {
+
+        winLevel();
+
+      }
+
+    };
+
+  });
+
+}
+
+$("start").onclick = () => {
+
+  name = $("playerName")
+    .value
+    .trim()
+    .replace(/\s+/g, " ");
+
+  if (!name) {
+
+    $("playerName").focus();
+
+    $("playerName").placeholder =
+      "¡Primero escribe tu nombre!";
+
+    return;
+
+  }
+
+  level = 0;
+
+  started = performance.now();
+
+  timer = setInterval(tick, 150);
+
+  tick();
+
+  render();
+
+};
+
+$("playerName").addEventListener(
+  "keydown",
+  event => {
+
+    if (event.key === "Enter") {
+
+      $("start").click();
+
+    }
+
+  }
+);
+
+$("retry").onclick = () => {
+
+  level = 0;
+
+  render();
+
+};
+
+$("hintBtn").onclick = () => {
+
+  msg(hints[level]);
+
+};
+
+window.addEventListener(
+  "beforeunload",
+  event => {
+
+    if (started) {
+
+      event.preventDefault();
+
+      event.returnValue = "";
+
+    }
+
+  }
+);
+
+})();
+</script>
+
+</body>
+</html>
